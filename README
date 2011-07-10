@@ -1,0 +1,12 @@
+A port of the twitter clone Retwis provided by Redis documentation written on node.js
+
+Relevant links
+
+http://redis.io/topics/twitter-clone
+http://redis.io/
+http://nodejs.org/
+http://jade-lang.com/
+http://expressjs.com/
+https://github.com/mranney/node_redis
+
+
