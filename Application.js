@@ -1,24 +1,39 @@
-var postVersion = 1;
-
 var express = require('express');
-var Util = require('./lib/retwis.js');
-var User = require('./lib/user.js');
+var app = express.createServer();
 var redis = require('redis');
-//redis.debug_mode = true;
 var r = redis.createClient(6379,'127.0.0.1');
 
-var app = express.createServer();
-app.use(express.cookieParser());
-app.use(express.bodyParser());
-app.use(express.static(__dirname + '/public'));
-app.set('view engine', 'jade');
-app.set('view options', {  layout: 'layout'});
+var Util = require('./lib/util.js');
+var User = require('./lib/user.js');
+var Post = require('./lib/post.js');
 
+app.set('view engine', 'jade');
+
+app.dynamicHelpers({
+   stash: function(req, res){
+      return req.stash; // Inspired by perl catalyst
+   }
+});
 
 app.configure(function(){
-    app.use(express.static(__dirname + '/public'));
-    app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
+   app.set('view engine', 'jade');
+   app.set('view options', { layout: 'layout' });
+   app.use(express.cookieParser());
+   app.use(express.bodyParser());
+   app.use(express.methodOverride());
+   app.use(express.compiler({ src: __dirname + '/public', enable: ['less'] }));
+   app.use(app.router);
+   app.use(express.static(__dirname + '/public', { maxAge: 60*60*24}));
 });
+
+app.configure('development', function(){
+  app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
+});
+
+app.configure('production', function(){
+  app.use(express.errorHandler());
+});
+
 
 
 app.all('*',function(req,res,next) {
@@ -47,11 +62,11 @@ app.get('/', function(req,res) {
             req.stash.user.getPosts(start,count,function(err,posts) {
                if (err) console.log("Error retrieving posts for UID:" + req.stash.user.id);
                req.stash.posts = posts || [];
-               res.render('index',req.stash);
+               res.render('index');
             });
       });
    } else {
-      res.render('welcome',req.stash);
+      res.render('welcome');
    }
 });
 
@@ -60,7 +75,7 @@ app.all('/post', function(req,res) {
 
    r.incr("global:nextPostId",function(err,pid) {
       var status = req.param('status').replace(/\n/,"");
-      var post = [postVersion,pid,req.stash.user.id,req.stash.user.name,+new Date(),status].join('|');
+      var post = [Post.currentVersion,pid,req.stash.user.id,req.stash.user.name,+new Date(),status].join('|');
 
       r.set("post:"+pid,post)
       r.lpush("global:timeline",pid);
@@ -74,7 +89,7 @@ app.all('/post', function(req,res) {
          users.push(req.stash.user.id);
          var multiAction = r.multi();
          for (uid in users) {
-            multiAction.lpush("uid:"+uid+":posts",pid);
+            multiAction.lpush("uid:"+users[uid]+":posts",pid);
          }
          multiAction.exec(function(err,replies) {res.redirect('/')});
       });
@@ -135,7 +150,7 @@ app.get('/profile/:username', function(req,res) {
       req.stash.username = req.param('username','');
       User.getPosts(uid,start,count,function(err,posts) {
          req.stash.posts = posts;
-         res.render('profile', req.stash);
+         res.render('profile');
       });
    });
 });
@@ -179,10 +194,9 @@ app.post('/register', function(req,res) {
                if (err) {
                   res.render('error',{error : 'Could not register user'});
                } else {
-console.log("User registered with session : " + session);
                   res.cookie('auth', session, {maxAge : 3600*24*365});
                   req.stash.user = user;
-                  res.render('registered',req.stash);
+                  res.render('registered');
                }
             });
          }
@@ -190,5 +204,22 @@ console.log("User registered with session : " + session);
    }
 });
 
-app.listen(8888);
+app.get('/timeline', function(req,res) {
+   r.sort('global:users','DESC','LIMIT','0','10','GET','uid:*:username',function(err,usernames) {
+      if (err) {console.log('error retrieving global users : ' + err)}
+      req.stash.usernames = usernames || [];
+
+      var start = req.param('start',0);
+      var count = req.param('count',10);
+      req.stash.start = start;
+      req.stash.count = count;
+      User.getPosts(-1, start, count, function(err, posts) {
+         if (err) {console.log('error retrieving all posts : ' + err)}
+         req.stash.posts = posts;
+         res.render('timeline');
+      });
+   });
+});
+
+app.listen(80);
 

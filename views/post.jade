@@ -1,0 +1,6 @@
+div.post
+   - var username = encodeURI(post.username);
+   a(class='username',href="/profile/#{username}") #{post.username}
+   #{post.status}
+   br
+   i posted #{post.time} ago via web

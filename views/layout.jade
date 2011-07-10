@@ -2,16 +2,25 @@
 html(lang="en")
    head
       title RetwisJS - Retwis Twitter clone ported to pure JavaScript
-      script(type='text/javascript')
-      link(href='/css/style.css',rel='stylesheet',type='text/css')
+      link(rel='stylesheet', href='/css/style.css')
    body
+      a(href="http://github.com/jsoverson/RetwisJS")
+         img(style="position:absolute;top:0;left:0;border:0;",src="https://gs1.wac.edgecastcdn.net/80460E/assets/img/5d21241b64dc708fcbb701f68f72f41e9f1fadd6/687474703a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f6c6566745f7265645f6161303030302e706e67",alt="Fork me on GitHub")
       div#page
          #header
             a(href='/')
                img(src='/logo.png')
             div#navbar
-               a(href="/") Home | 
-               a(href="/timeline") Timeline | 
-               a(href="/logout") Logout | 
+               a(href="/") Home
+               \ | 
+               a(href="/timeline") Timeline
+               - if (stash.user.isLoggedIn()) 
+                  \ | <a href="/logout">Logout</a>
          !{body}               
-         #footer FOOTER!
+         #footer
+            div.
+               This was written by <a href="http://jarrodoverson.com/">Jarrod Overson</a> to serve as an example for
+               <a href="http://nodejs.org/">node.js</a>,
+               <a href="http://redis.io/">redis</a>, and
+               <a href="http://expressjs.com/">express</a>.
+               Get the code <a href="https://github.com/jsoverson/RetwisJS">here</a>.

@@ -1,0 +1,10 @@
+h2 Timeline
+i Latest registered users (an example of SORT command!)
+br
+ul
+   - each username in stash.usernames
+      li 
+         a(class="username",href="/profile/#{encodeURI(username)}") #{username}
+br
+i Latest 50 messages from users aroud the world!
+!{partial('post',stash.posts)}
