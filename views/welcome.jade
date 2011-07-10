@@ -1,0 +1,39 @@
+div#welcomebox
+   #registerbox
+      h2 Register!
+      b Want to try Retwis? Create an account!
+      form(method='post',action='/register')
+         table
+            tr
+               td Username
+               td
+                  input(type="text",name="username")
+            tr
+               td Password
+               td
+                  input(type="password",name="password")
+            tr
+               td Password (again)
+               td
+                  input(type="password",name="password2")
+            tr
+               td(colspan="2",align="right")
+                  input(type="submit")
+      h2 Already registered? Login Here
+      form(method='post',action='/login')
+         table
+            tr
+               td Username
+               td
+                  input(type="text",name="username")
+            tr
+               td Password
+               td
+                  input(type="password",name="password")
+            tr
+               td(colspan="2",align="right")
+                  input(type="submit")
+   span Hello! Retwis is a very simple clone of <a href="http://twitter.com">Twitter</a>, as a demo for the <a href="http://code.google.com/p/redis/">Redis</a> key-value database. Key points:
+   ul
+      li Redis is a key-value DB, and it is <b>the only DB used</b> by this application, no MySQL or alike at all.
+      li This application can scale horizontally since there is no point where the whole dataset is needed at the same point. With consistent hashing (not implemented in the demo to make it simpler) different keys can be stored in different servers.

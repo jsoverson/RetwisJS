@@ -1,0 +1,11 @@
+h2(class="username") #{username}
+- if (user.isLoggedIn() && user.id != uid)
+   a(href="/follow/#{uid}",class="button") Follow this user
+   a(href="/unfollow/#{uid}",class="button") Don't follow this user
+- var username = encodeURI(user.name);
+- each post in posts
+   div.post
+      a(class='username',href="/profile/#{username}") #{post.username}
+      #{post.status}
+      br
+      i posted #{post.time} ago via web

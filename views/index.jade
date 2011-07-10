@@ -1,0 +1,21 @@
+div#postform
+   form(method="post",action="/post")
+      span #{user.name}
+      br
+      table
+         tr
+            td
+               textarea(cols="70",rows="3", name="status")
+         tr
+            td(align="right")
+               input(type="submit")
+   #homeinfobox
+      span #{followers} followers
+      span #{following} following
+- each post in posts
+   - var username = encodeURI(post.username);
+   div.post
+      a(class='username',href="/profile/#{username}") #{post.username}
+      #{post.status}
+      br
+      i posted #{post.time} ago via web
