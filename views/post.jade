@@ -1,6 +1,10 @@
+- var now = +new Date();
+- var elapsed = (now - post.time) / 1000;
+// TODO: I know, i know. turn down the suck on this line.
+- var elapsedString = elapsed > 60 ? elapsed > 60 * 60 ? elapsed > 60 * 60 * 24 ? (elapsed / (60 * 60 * 24)).toFixed(0) + " days" : (elapsed / (60 * 60)).toFixed(0) + " hours" : (elapsed / 60).toFixed(0) + " minutes" : elapsed.toFixed(0) + " seconds"
 div.post
    - var username = encodeURI(post.username);
    a(class='username',href="/profile/#{username}") #{post.username}
    #{post.status}
    br
-   i posted #{post.time} ago via web
+   i posted #{elapsedString} ago via web
